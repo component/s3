@@ -1,0 +1,25 @@
+{
+  "name": "s3-component",
+  "description": "S3 client upload library",
+  "version": "0.0.1",
+  "keywords": [
+    "s3",
+    "browser",
+    "cors",
+    "upload"
+  ],
+  "dependencies": {
+    "querystring-component": "1.0.0"
+  },
+  "development": {
+    "bytes": "~0.2.0",
+    "express": "~3.1.0",
+    "ms": "~0.5.1"
+  },
+  "license": "MIT",
+  "component": {
+    "scripts": {
+      "s3/index.js": "index.js"
+    }
+  }
+}

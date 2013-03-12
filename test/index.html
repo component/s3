@@ -1,0 +1,72 @@
+<html>
+<head>
+  <title>S3 component</title>
+  <style>
+    @-webkit-keyframes show {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+    body {
+      text-align: center;
+    }
+    #drop-anywhere {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,.8);
+      line-height: 500px;
+      text-align: center;
+      color: white;
+      display: none;
+    }
+    #drop-anywhere::before {
+      content: 'Drop to upload!';
+    }
+    #drop-anywhere.show {
+      display: block;
+      -webkit-animation: show 300ms;
+    }
+    #progress {
+      font: 12px Helvetica;
+      margin: 50px auto;
+      border: 1px dotted #ddd;
+      border-radius: 50%;
+      width: 100px;
+      height: 100px;
+      line-height: 100px;
+    }
+  </style>
+</head>
+<body>
+  <script src="/build.js"></script>
+  <div id="progress">0%</div>
+  <script>
+    var Upload = require('s3');
+    var drop = require('component-drop-anywhere');
+
+    drop(function(err, drop){
+      if ('upload' != drop.type) return;
+      var file = drop.item.file;
+      console.log('upload %s', file.name);
+      var uid = Math.random() * 1e10 | 0;
+      var upload = Upload(file, { name: uid })
+
+      var prog = document.querySelector('#progress');
+      upload.on('progress', function(e){
+        prog.textContent = (e.percent | 0) + '%';
+      });
+
+      upload.end(function(err){
+        if (err) throw err;
+        console.log('upload complete %s', upload.name);
+      });
+    });
+  </script>
+</body>
+</html>
