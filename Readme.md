@@ -11,7 +11,7 @@
 
 ```js
 var Upload = require('s3');
-var drop = require('component-drop-anywhere');
+var drop = require('drop-anywhere');
 
 drop(function(err, drop){
   if ('upload' != drop.type) return;
