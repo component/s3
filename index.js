@@ -106,8 +106,7 @@ Upload.prototype.put = function(url, fn){
   // send
   req.send(blob);
 
-  req.end(function(err, res){
-    if (err) return fn(err);
+  req.end(function(res){
     if (res.error) return fn(res.error);
     self.emit('end');
     fn();
