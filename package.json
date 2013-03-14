@@ -9,9 +9,9 @@
     "upload"
   ],
   "dependencies": {
-    "querystring-component": "1.0.0"
+    "superagent": "0.13.0"
   },
-  "development": {
+  "devDependencies": {
     "bytes": "~0.2.0",
     "express": "~3.1.0",
     "ms": "~0.5.1"

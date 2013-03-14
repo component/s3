@@ -4,7 +4,7 @@
  */
 
 var Emitter = require('emitter')
-  , qs = require('querystring');
+  , request = require('superagent');
 
 /**
  * Expose `Upload`.
@@ -49,20 +49,6 @@ function Upload(file, options) {
 Emitter(Upload.prototype);
 
 /**
- * Return querystring.
- *
- * @return {String}
- * @api private
- */
-
-Upload.prototype.query = function(){
-  return qs.stringify({
-    name: this.name,
-    mime: this.type
-  });
-};
-
-/**
  * Fetch signed url and invoke `fn(err, url)`.
  *
  * @param {Function} fn
@@ -70,17 +56,12 @@ Upload.prototype.query = function(){
  */
 
 Upload.prototype.sign = function(fn){
-  var req = new XMLHttpRequest;
-  req.open('GET', this.route + '?' + this.query(), true);
-
-  // TODO: use xhr lib
-  req.onreadystatechange = function(){
-    if (4 == req.readyState) {
-      fn(null, req.response);
-    }
-  };
-
-  req.send();
+  request
+  .get(this.route)
+  .query({ name: this.name, mime: this.type })
+  .end(function(res){
+    fn(null, res.text);
+  });
 };
 
 /**
@@ -93,7 +74,6 @@ Upload.prototype.sign = function(fn){
 Upload.prototype.end = function(fn){
   var self = this;
   fn = fn || function(){};
-
   this.sign(function(err, url){
     if (err) return fn(err);
     self.put(url, fn);
@@ -109,29 +89,29 @@ Upload.prototype.end = function(fn){
  */
 
 Upload.prototype.put = function(url, fn){
-  // request
-  var req = this.req = new XMLHttpRequest;
-  req.onload = this.onload.bind(this);
-  req.onerror = this.onerror.bind(this);
-  req.upload.onprogress = this.onprogress.bind(this);
-  req.open('PUT', url, true);
+  var self = this;
+  var blob = this.file.slice();
+  var req = this.req = request.put(url);
 
-  // TODO: use xhr lib
-  req.onreadystatechange = function(){
-    if (4 == req.readyState) {
-      var s = req.status;
-      var type = s / 100 | 0;
-      if (2 == type) return fn(null, req);
-      var err = new Error((req.statusText || s) + ': ' + req.response);
-      err.status = s;
-      fn(err);
-    }
-  };
+  // header
+  req.set('X-Requested-With', null);
+  req.set('Content-Type', this.type);
+  req.set('x-amz-acl', 'public-read');
+
+  // progress
+  req.on('progress', function(e){
+    self.emit('progress', e);
+  });
 
   // send
-  req.setRequestHeader('x-amz-acl', 'public-read');
-  req.setRequestHeader('Content-Type', this.type);
-  req.send(this.file.slice());
+  req.send(blob);
+
+  req.end(function(err, res){
+    if (err) return fn(err);
+    if (res.error) return fn(res.error);
+    self.emit('end');
+    fn();
+  });
 };
 
 /**
@@ -145,33 +125,3 @@ Upload.prototype.abort = function(){
   this.req.abort();
 };
 
-/**
- * Error handler.
- *
- * @api private
- */
-
-Upload.prototype.onerror = function(e){
-  this.emit('error', e);
-};
-
-/**
- * Onload handler.
- *
- * @api private
- */
-
-Upload.prototype.onload = function(e){
-  this.emit('end', this.req);
-};
-
-/**
- * Progress handler.
- *
- * @api private
- */
-
-Upload.prototype.onprogress = function(e){
-  e.percent = e.loaded / e.total * 100;
-  this.emit('progress', e);
-};

@@ -6,7 +6,7 @@
   "keywords": ["s3", "file", "upload", "cors", "progress"],
   "dependencies": {
     "component/emitter": "*",
-    "component/querystring": "*"
+    "visionmedia/superagent": "0.13.0"
   },
   "development": {
     "component/drop-anywhere": "*"

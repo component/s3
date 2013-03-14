@@ -22,6 +22,7 @@ app.get('/sign', function(req, res){
     method: 'PUT'
   };
 
+  console.log(obj);
   res.send(sign(obj));
 });
 
