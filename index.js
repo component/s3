@@ -40,6 +40,7 @@ function Upload(file, options) {
   this.type = options.type || file.type;
   this.name = options.name || file.name;
   this.route = options.route || '/sign';
+  this.header = {};
 }
 
 /**
@@ -47,6 +48,20 @@ function Upload(file, options) {
  */
 
 Emitter(Upload.prototype);
+
+/**
+ * Set header `field` to `val`.
+ *
+ * @param {String} field
+ * @param {String} val
+ * @return {Upload} self
+ * @api public
+ */
+
+Upload.prototype.set = function(field, val){
+  this.header[field] = val;
+  return this;
+};
 
 /**
  * Fetch signed url and invoke `fn(err, url)`.
@@ -97,6 +112,11 @@ Upload.prototype.put = function(url, fn){
   req.set('X-Requested-With', null);
   req.set('Content-Type', this.type);
   req.set('x-amz-acl', 'public-read');
+
+  // custom fields
+  for (var key in this.header) {
+    req.set(key, this.header[key]);
+  }
 
   // progress
   req.on('progress', function(e){
