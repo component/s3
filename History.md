@@ -1,4 +1,9 @@
 
+0.2.0 / 2013-03-27 
+==================
+
+  * add Upload#set(field, value) for custom header fields
+
 0.1.1 / 2013-03-14 
 ==================
 
