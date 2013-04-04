@@ -18,7 +18,7 @@ module.exports = Upload;
  * Options:
  *
  *   - `name` remote filename or `file.name`
- *   - `type` content-type or `file.type`
+ *   - `type` content-type or `file.type` / application/octet-stream
  *   - `route` signature GET route [/sign]
  *
  * Events:
@@ -37,7 +37,7 @@ function Upload(file, options) {
   if (!(this instanceof Upload)) return new Upload(file, options);
   options = options || {};
   this.file = file;
-  this.type = options.type || file.type;
+  this.type = options.type || file.type || 'application/octet-stream';
   this.name = options.name || file.name;
   this.route = options.route || '/sign';
   this.header = {};
