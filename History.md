@@ -1,4 +1,10 @@
 
+0.2.1 / 2013-04-04 
+==================
+
+  * add application/octet-stream default
+  * add x-browser slice
+
 0.2.0 / 2013-03-27 
 ==================
 
