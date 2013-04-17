@@ -105,7 +105,6 @@ Upload.prototype.end = function(fn){
 
 Upload.prototype.put = function(url, fn){
   var self = this;
-  var blob = slice(this.file);
   var req = this.req = request.put(url);
 
   // header
@@ -124,7 +123,7 @@ Upload.prototype.put = function(url, fn){
   });
 
   // send
-  req.send(blob);
+  req.send(this.file);
 
   req.end(function(res){
     if (res.error) return fn(res.error);
@@ -143,19 +142,3 @@ Upload.prototype.abort = function(){
   this.emit('abort');
   this.req.abort();
 };
-
-
-/**
- * Cross-browser file slice
- *
- * @param {File} file
- * @return {Blob} blob
- * @api private
- */
-
-function slice(file) {
-  if (file.slice) return file.slice();
-  if (file.webkitSlice) return file.webkitSlice();
-  if (file.mozSlice) return file.mozSlice();
-  throw new Error('slice is not supported in your browser');
-}
