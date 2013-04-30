@@ -123,7 +123,11 @@ Upload.prototype.put = function(url, fn){
   });
 
   // send
-  req.send(this.file);
+  var file = this.file.toFile
+    ? this.file.toFile()
+    : this.file;
+
+  req.send(file);
 
   req.end(function(res){
     if (res.error) return fn(res.error);
