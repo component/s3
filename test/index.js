@@ -20,7 +20,7 @@ app.get('/sign', function(req, res){
     mime: req.query.mime,
     name: req.query.name,
     acl: 'public-read',
-    method: 'PUT'
+    method: req.query.method || 'PUT'
   };
 
   console.log(obj);
