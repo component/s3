@@ -48,23 +48,27 @@
   <div id="progress">0%</div>
   <script>
     var Upload = require('s3');
-    var drop = require('component-drop-anywhere');
+    var drop = require('drop-anywhere');
 
-    drop(function(err, drop){
-      if ('upload' != drop.type) return;
-      var file = drop.item.file;
-      console.log('upload %s', file.name);
-      var uid = Math.random() * 1e10 | 0;
-      var upload = Upload(file, { name: uid })
+    drop(function(e){
+      e.items.forEach(function(item){
+        if ('file' != item.kind) return;
 
-      var prog = document.querySelector('#progress');
-      upload.on('progress', function(e){
-        prog.textContent = (e.percent | 0) + '%';
-      });
+        var start = new Date;
+        console.log('upload %s', item.name);
+        var uid = Math.random() * 1e10 | 0;
+        var upload = Upload(item, { name: uid })
 
-      upload.end(function(err){
-        if (err) throw err;
-        console.log('upload complete %s', upload.name);
+        var prog = document.querySelector('#progress');
+        upload.on('progress', function(e){
+          prog.textContent = (e.percent | 0) + '%';
+        });
+
+        upload.end(function(err){
+          if (err) throw err;
+          var ms = new Date - start;
+          console.log('upload completed in %ss', (ms / 1000).toFixed(2));
+        });
       });
     });
   </script>
