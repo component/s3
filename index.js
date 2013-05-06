@@ -28,6 +28,10 @@ module.exports = Upload;
  *   - `progress` upload in progress (`e.percent` etc)
  *   - `end` upload is complete
  *
+ * TODO: progress
+ * TODO: add option for max parts
+ * TODO: add option for opting-out
+ *
  * @param {File} file
  * @param {Object} [options]
  * @api private
