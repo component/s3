@@ -19,6 +19,7 @@ app.get('/sign', function(req, res){
     expires: 5 * 60 * 1000,
     mime: req.query.mime,
     name: req.query.name,
+    acl: 'public-read',
     method: 'PUT'
   };
 
@@ -36,9 +37,9 @@ function sign(options) {
   var expires = (Date.now() + options.expires) / 1000 | 0;
 
   var str = options.method.toUpperCase()
-    + '\n\n' + options.mime
+    + '\n\n' + (options.mime || '')
     + '\n' + expires
-    + '\nx-amz-acl:public-read'
+    + '\n' + (options.acl ? 'x-amz-acl:' + options.acl : '')
     + '\n/' + options.bucket
     + '/' + options.name;
 
