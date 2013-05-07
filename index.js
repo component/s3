@@ -31,15 +31,9 @@ module.exports = Upload;
  *   - `progress` upload in progress (`e.percent` etc)
  *   - `end` upload is complete
  *
-<<<<<<< HEAD
- * TODO: progress
- * TODO: add option for max parts
- * TODO: add option for opting-out
-=======
  * Multipart:
  *
  *  Each s3 "part" must be at least 5mb, except the last part.
->>>>>>> add/multipart-support
  *
  * @param {File} file
  * @param {Object} [options]
