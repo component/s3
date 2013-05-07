@@ -5,7 +5,9 @@
   "version": "0.3.0",
   "keywords": ["s3", "file", "upload", "cors", "progress"],
   "dependencies": {
+    "component/mean": "*",
     "component/emitter": "*",
+    "visionmedia/batch": "0.3.2",
     "visionmedia/superagent": "0.13.0"
   },
   "development": {
@@ -13,6 +15,8 @@
   },
   "license": "MIT",
   "scripts": [
-    "index.js"
+    "index.js",
+    "part.js",
+    "multipart.js"
   ]
 }

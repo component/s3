@@ -1,5 +1,5 @@
 
-build: components index.js
+build: components index.js part.js multipart.js
 	@component build --dev
 
 components: component.json

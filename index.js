@@ -3,8 +3,9 @@
  * Module dependencies.
  */
 
-var Emitter = require('emitter')
-  , request = require('superagent');
+var request = require('superagent');
+var Multipart = require('./multipart');
+var Emitter = require('emitter');
 
 /**
  * Expose `Upload`.
@@ -20,6 +21,8 @@ module.exports = Upload;
  *   - `name` remote filename or `file.name`
  *   - `type` content-type or `file.type` / application/octet-stream
  *   - `route` signature GET route [/sign]
+ *   - `maxParts` max parallel parts [6]
+ *   - `multipartThreshold` [20mb]
  *
  * Events:
  *
@@ -28,9 +31,15 @@ module.exports = Upload;
  *   - `progress` upload in progress (`e.percent` etc)
  *   - `end` upload is complete
  *
+<<<<<<< HEAD
  * TODO: progress
  * TODO: add option for max parts
  * TODO: add option for opting-out
+=======
+ * Multipart:
+ *
+ *  Each s3 "part" must be at least 5mb, except the last part.
+>>>>>>> add/multipart-support
  *
  * @param {File} file
  * @param {Object} [options]
@@ -45,6 +54,9 @@ function Upload(file, options) {
   this.name = options.name || file.name;
   this.route = options.route || '/sign';
   this.header = {};
+  this.maxParts = options.maxParts || 6;
+  var mb = 1024 * 1024;
+  this.multipartThreshold = options.multipartThreshold || 20 * mb;
 }
 
 /**
@@ -74,13 +86,25 @@ Upload.prototype.set = function(field, val){
  * @api private
  */
 
-Upload.prototype.sign = function(fn){
+Upload.prototype.sign = function(obj, fn){
   request
   .get(this.route)
-  .query({ name: this.name, mime: this.type })
+  .query(obj)
   .end(function(res){
     fn(null, res.text);
   });
+};
+
+/**
+ * Check `File#size` is above the multipart threshold specified.
+ *
+ * @return {Boolean}
+ * @api private
+ */
+
+Upload.prototype.shouldUseMultipart = function(){
+  return 'number' == typeof this.file.size
+    && this.file.size > this.multipartThreshold;
 };
 
 /**
@@ -93,10 +117,34 @@ Upload.prototype.sign = function(fn){
 Upload.prototype.end = function(fn){
   var self = this;
   fn = fn || function(){};
-  this.sign(function(err, url){
+
+  if (this.shouldUseMultipart()) {
+    return this.multipart(fn);
+  }
+
+  var options = {
+    name: this.name,
+    mime: this.type,
+    acl: 'public-read'
+  };
+
+  this.sign(options, function(err, url){
     if (err) return fn(err);
     self.put(url, fn);
   });
+};
+
+/**
+ * Upload using multipart and invoke `fn(err)`.
+ *
+ * @param {Function} fn
+ * @api private
+ */
+
+Upload.prototype.multipart = function(fn){
+  var multipart = new Multipart(this, { maxParts: this.maxParts });
+  multipart.on('progress', this.emit.bind(this, 'progress'));
+  multipart.end(fn);
 };
 
 /**

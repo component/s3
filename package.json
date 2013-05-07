@@ -19,7 +19,9 @@
   "license": "MIT",
   "component": {
     "scripts": {
-      "s3/index.js": "index.js"
+      "s3/index.js": "index.js",
+      "s3/part.js": "part.js",
+      "s3/multipart.js": "multipart.js"
     }
   }
 }
