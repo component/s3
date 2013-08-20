@@ -9,7 +9,7 @@
     "upload"
   ],
   "dependencies": {
-    "event-component-": "*"
+    "event-component": "*"
   },
   "devDependencies": {
     "bytes": "~0.2.1",
