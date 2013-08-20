@@ -1,7 +1,7 @@
 {
   "name": "s3-component",
   "description": "S3 client upload library",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "keywords": [
     "s3",
     "browser",
@@ -9,11 +9,10 @@
     "upload"
   ],
   "dependencies": {
-    "strftime": "~0.6.1",
-    "bytes": "~0.2.1"
+    "event-component-": "*"
   },
   "devDependencies": {
-    "bytes": "~0.2.0",
+    "bytes": "~0.2.1",
     "express": "~3.1.0",
     "ms": "~0.5.1"
   },
