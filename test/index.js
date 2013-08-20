@@ -3,57 +3,91 @@
  * Module dependencies.
  */
 
-var conf = require('../config')
-  , crypto = require('crypto')
-  , express = require('express');
+var conf = require('../config');
+var crypto = require('crypto');
+var express = require('express');
+var bytes = require('bytes');
+var fs = require('fs');
 
 var app = express();
 
 app.use(express.logger('dev'));
-
-app.get('/sign', function(req, res){
-  var obj = {
-    bucket: conf.bucket,
-    key: conf.key,
-    secret: conf.secret,
-    expires: 5 * 60 * 1000,
-    mime: req.query.mime,
-    name: req.query.name,
-    acl: 'public-read',
-    method: req.query.method || 'PUT'
-  };
-
-  console.log(obj);
-  res.send(sign(obj));
-});
-
 app.use(express.static(__dirname + '/../build'));
-app.use(express.static(__dirname));
+
+app.get('/', function(req, res){
+  fs.readFile('test/index.html', 'utf8', function(err, html){
+    if (err) return res.send(505);
+    // generate policy
+
+    var min = 60000;
+    var hour = 60 * min;
+    var now = Date.now();
+
+    var pol = policy({
+      acl: 'public-read',
+      expires: new Date(now + hour),
+      bucket: conf.bucket,
+      conditions: [
+        ['starts-with', '$key', 'uploads/'],
+        ['starts-with', '$Content-Type', ''],
+        ['starts-with', '$Content-Length', ''],
+        ['content-length-range', 1, bytes('2mb')]
+      ]
+    });
+
+    var sig = signature(pol, conf.secret);
+
+    // use a template or whatever you want, just make sure
+    // the "S3" global variable config is set.
+    var s3 = {
+      policy: pol,
+      signature: sig,
+      bucket: conf.bucket,
+      acl: 'public-read',
+      key: conf.key
+    };
+
+
+    html = html.replace('{{s3}}', JSON.stringify(s3));
+    res.send(html);
+  });
+});
 
 app.listen(4000);
 console.log('listening on port 4000');
 
-function sign(options) {
-  var expires = (Date.now() + options.expires) / 1000 | 0;
+function policy(opts) {
+  if (!opts) throw new Error('settings required');
+  if (!opts.expires) throw new Error('.expires required');
+  if (!opts.bucket) throw new Error('.bucket required');
+  if (!opts.acl) throw new Error('.acl required');
 
-  var str = options.method.toUpperCase()
-    + '\n\n' + (options.mime || '')
-    + '\n' + expires
-    + '\n' + (options.acl ? 'x-amz-acl:' + options.acl : '')
-    + '\n/' + options.bucket
-    + '/' + options.name;
+  var conds = opts.conditions || [];
+  conds.push({ bucket: opts.bucket });
+  conds.push({ acl: opts.acl });
+  
+  var policy = {
+    expiration: opts.expires.toISOString(),
+    conditions: conds
+  };
 
-  var sig = crypto
-    .createHmac('sha1', options.secret)
-    .update(str)
+  var json = JSON.stringify(policy);
+  var base = new Buffer(json).toString('base64');
+  return base;
+}
+
+/**
+ * SHA1 of the policy / secret.
+ *
+ * @param {String} policy
+ * @param {String} secret
+ * @return {String}
+ * @api private
+ */
+
+function signature(policy, secret) {
+  return crypto
+    .createHmac('sha1', secret)
+    .update(policy)
     .digest('base64');
-
-  sig = encodeURIComponent(sig);
-
-  return 'http://' + options.bucket
-    + '.s3-us-west-1.amazonaws.com/'
-    + options.name
-    + '?Expires=' + expires
-    + '&AWSAccessKeyId=' + options.key
-    + '&Signature=' + sig;
 }

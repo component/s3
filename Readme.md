@@ -1,11 +1,21 @@
 
 # s3
 
-  S3 client upload library
+  S3 client upload library.
 
 ## Installation
 
     $ component install component/s3
+
+## Config
+
+  An `S3` global must be initialized with some configuration:
+
+  - `policy` - the base64 json policy
+  - `signature` - the policy signature
+  - `bucket` the bucket name
+  - `acl` ACL such as "public-read"
+  - `key` access key
 
 ## Example
 
@@ -28,6 +38,7 @@ drop(function(err, drop){
   upload.end(function(err){
     if (err) throw err;
     console.log('upload complete %s', upload.name);
+    console.log(upload.url);
   });
 });
 ```
@@ -36,16 +47,11 @@ drop(function(err, drop){
 
 ### Upload(options)
 
-  By default an upload performs a __GET__ request to the "/sign" end-point,
-  which responds with a url signed by your aws secret.
-
   - `name` remote filename or `file.name`
   - `type` content-type or `file.type`
-  - `route` signature GET route [/sign]
 
 Events:
 
-  - `error` an error occurred
   - `abort` upload was aborted
   - `progress` upload in progress (`e.percent` etc)
   - `end` upload is complete

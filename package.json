@@ -9,7 +9,8 @@
     "upload"
   ],
   "dependencies": {
-    "superagent": "0.13.0"
+    "strftime": "~0.6.1",
+    "bytes": "~0.2.1"
   },
   "devDependencies": {
     "bytes": "~0.2.0",

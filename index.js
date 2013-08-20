@@ -3,8 +3,8 @@
  * Module dependencies.
  */
 
-var Emitter = require('emitter')
-  , request = require('superagent');
+var Emitter = require('emitter');
+var events = require('event');
 
 /**
  * Expose `Upload`.
@@ -13,13 +13,26 @@ var Emitter = require('emitter')
 module.exports = Upload;
 
 /**
+ * Validate global configuration.
+ *
+ * @api private
+ */
+
+function validateConfig() {
+  if (!S3.signature) throw new Error('S3.signature required');
+  if (!S3.bucket) throw new Error('S3.bucket required');
+  if (!S3.policy) throw new Error('S3.policy required');
+  if (!S3.key) throw new Error('S3.key required');
+  if (!S3.acl) throw new Error('S3.acl required');
+}
+
+/**
  * Initialize a new `Upload` file` and options.
  *
  * Options:
  *
  *   - `name` remote filename or `file.name`
  *   - `type` content-type or `file.type` / application/octet-stream
- *   - `route` signature GET route [/sign]
  *
  * Events:
  *
@@ -37,14 +50,20 @@ module.exports = Upload;
  * @api private
  */
 
-function Upload(file, options) {
-  if (!(this instanceof Upload)) return new Upload(file, options);
-  options = options || {};
+function Upload(file, opts) {
+  if (!(this instanceof Upload)) return new Upload(file, opts);
+  opts = opts || {};
+  validateConfig();
   this.file = file;
-  this.type = options.type || file.type || 'application/octet-stream';
-  this.name = options.name || file.name;
-  this.route = options.route || '/sign';
-  this.header = {};
+  this.type = opts.type || file.type || 'application/octet-stream';
+  this.name = opts.name || file.name;
+  this.bucketUrl = 'http://' + S3.bucket + '.s3.amazonaws.com';
+  this.url = this.bucketUrl + '/' + this.name;
+  this.signature = S3.signature;
+  this.bucket = S3.bucket;
+  this.policy = S3.policy;
+  this.key = S3.key;
+  this.acl = S3.acl;
 }
 
 /**
@@ -54,37 +73,7 @@ function Upload(file, options) {
 Emitter(Upload.prototype);
 
 /**
- * Set header `field` to `val`.
- *
- * @param {String} field
- * @param {String} val
- * @return {Upload} self
- * @api public
- */
-
-Upload.prototype.set = function(field, val){
-  this.header[field] = val;
-  return this;
-};
-
-/**
- * Fetch signed url and invoke `fn(err, url)`.
- *
- * @param {Function} fn
- * @api private
- */
-
-Upload.prototype.sign = function(fn){
-  request
-  .get(this.route)
-  .query({ name: this.name, mime: this.type })
-  .end(function(res){
-    fn(null, res.text);
-  });
-};
-
-/**
- * Upload the file and invoke `fn(err)`.
+ * Upload the file to s3 and invoke `fn(err)` when complete.
  *
  * @param {Function} [fn]
  * @api public
@@ -93,51 +82,38 @@ Upload.prototype.sign = function(fn){
 Upload.prototype.end = function(fn){
   var self = this;
   fn = fn || function(){};
-  this.sign(function(err, url){
-    if (err) return fn(err);
-    self.put(url, fn);
-  });
-};
 
-/**
- * PUT to `url` and invoke `fn(err)`.
- *
- * @param {String} url
- * @param {Function} fn
- * @api private
- */
+  var xhr = this.xhr = new XMLHttpRequest;
 
-Upload.prototype.put = function(url, fn){
-  var self = this;
-  var req = this.req = request.put(url);
-
-  // header
-  req.set('X-Requested-With', null);
-  req.set('Content-Type', this.type);
-  req.set('x-amz-acl', 'public-read');
-
-  // custom fields
-  for (var key in this.header) {
-    req.set(key, this.header[key]);
-  }
-
-  // progress
-  req.on('progress', function(e){
+  // TODO: component
+  events.bind(xhr.upload, 'progress', function(e){
+    e.percent = e.loaded / e.total * 100;
     self.emit('progress', e);
   });
 
-  // send
-  var file = this.file.toFile
-    ? this.file.toFile()
-    : this.file;
+  // TODO: component
+  xhr.onreadystatechange = function(){
+    if (4 != xhr.readyState) return;
+    var t = xhr.status / 100 | 0;
+    if (2 == t) return fn();
+    var err = new Error(xhr.responseText);
+    err.status = xhr.status;
+    fn(err);
+  };
 
-  req.send(file);
+  // form
+  var form = new FormData;
+  form.append('key', this.name);
+  form.append('AWSAccessKeyId', this.key);
+  form.append('acl', this.acl);
+  form.append('policy', this.policy);
+  form.append('signature', this.signature);
+  form.append('Content-Type', this.type);
+  form.append('Content-Length', this.file.length);
+  form.append('file', this.file);
 
-  req.end(function(res){
-    if (res.error) return fn(res.error);
-    self.emit('end');
-    fn();
-  });
+  xhr.open('POST', this.bucketUrl, true);
+  xhr.send(form);
 };
 
 /**
@@ -148,5 +124,5 @@ Upload.prototype.put = function(url, fn){
 
 Upload.prototype.abort = function(){
   this.emit('abort');
-  this.req.abort();
+  this.xhr.abort();
 };

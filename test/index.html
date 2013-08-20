@@ -45,7 +45,9 @@
 </head>
 <body>
   <script src="/build.js"></script>
+  <script>var S3 = {{s3}}</script>
   <div id="progress">0%</div>
+  <a id="link"></a>
   <script>
     var Upload = require('s3');
     var drop = require('drop-anywhere');
@@ -57,7 +59,8 @@
         var start = new Date;
         console.log('upload %s', item.name);
         var uid = Math.random() * 1e10 | 0;
-        var upload = Upload(item, { name: uid })
+        var name = 'uploads/' + uid;
+        var upload = Upload(item, { name: name });
 
         var prog = document.querySelector('#progress');
         upload.on('progress', function(e){
@@ -68,6 +71,9 @@
           if (err) throw err;
           var ms = new Date - start;
           console.log('upload completed in %ss', (ms / 1000).toFixed(2));
+          var a = document.querySelector('#link');
+          a.href = upload.url;
+          a.textContent = 'View ' + upload.file.name;
         });
       });
     });
