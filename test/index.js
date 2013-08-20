@@ -7,6 +7,7 @@ var conf = require('../config');
 var crypto = require('crypto');
 var express = require('express');
 var bytes = require('bytes');
+var policy = require('s3-policy');
 var fs = require('fs');
 
 var app = express();
@@ -23,25 +24,21 @@ app.get('/', function(req, res){
     var hour = 60 * min;
     var now = Date.now();
 
-    var pol = policy({
+    var p = policy({
       acl: 'public-read',
       expires: new Date(now + hour),
       bucket: conf.bucket,
-      conditions: [
-        ['starts-with', '$key', 'uploads/'],
-        ['starts-with', '$Content-Type', ''],
-        ['starts-with', '$Content-Length', ''],
-        ['content-length-range', 1, bytes('2mb')]
-      ]
-    });
-
-    var sig = signature(pol, conf.secret);
+      secret: conf.secret,
+      key: conf.key,
+      name: 'uploads/',
+      length: bytes('2mb')
+    })
 
     // use a template or whatever you want, just make sure
     // the "S3" global variable config is set.
     var s3 = {
-      policy: pol,
-      signature: sig,
+      policy: p.policy,
+      signature: p.signature,
       bucket: conf.bucket,
       acl: 'public-read',
       key: conf.key
