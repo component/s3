@@ -1,4 +1,3 @@
-
 /**
  * Module dependencies.
  */
@@ -53,11 +52,12 @@ function validateConfig() {
 function Upload(file, opts) {
   if (!(this instanceof Upload)) return new Upload(file, opts);
   opts = opts || {};
+  if (!opts.protocol) opts.protocol = window.location.protocol;
   validateConfig();
   this.file = file;
   this.type = opts.type || file.type || 'application/octet-stream';
   this.name = opts.name || file.name;
-  this.bucketUrl = 'http://' + S3.bucket + '.s3.amazonaws.com';
+  this.bucketUrl = opts.protocol + '//' + S3.bucket + '.s3.amazonaws.com';
   this.url = this.bucketUrl + '/' + this.name;
   this.signature = S3.signature;
   this.bucket = S3.bucket;
