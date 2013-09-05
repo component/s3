@@ -1,7 +1,7 @@
 {
   "name": "s3-component",
   "description": "S3 client upload library",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "keywords": [
     "s3",
     "browser",
