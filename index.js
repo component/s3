@@ -104,6 +104,8 @@ Upload.prototype.end = function(fn){
  */
 
 Upload.prototype.put = function(url, fn){
+  if (this.aborted) return;
+
   var self = this;
   var req = this.req = request.put(url);
 
@@ -143,6 +145,7 @@ Upload.prototype.put = function(url, fn){
  */
 
 Upload.prototype.abort = function(){
+  this.aborted = true;
+  if (this.req) this.req.abort();
   this.emit('abort');
-  this.req.abort();
 };
