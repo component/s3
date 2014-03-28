@@ -71,7 +71,7 @@ Upload.prototype.set = function(field, val){
  */
 
 Upload.prototype.sign = function(fn){
-  request
+  this.req = request
   .get(this.route)
   .query({ name: this.name, mime: this.type })
   .end(function(res){
@@ -145,7 +145,9 @@ Upload.prototype.put = function(url, fn){
  */
 
 Upload.prototype.abort = function(){
+  if (this.aborted) return this;
   this.aborted = true;
   if (this.req) this.req.abort();
   this.emit('abort');
+  return this;
 };
