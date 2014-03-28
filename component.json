@@ -1,8 +1,8 @@
 {
   "name": "s3",
-  "repo": "component/s3",
+  "repo": "Automattic/s3",
   "description": "S3 client upload library, upload files directly from the browser",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "keywords": ["s3", "file", "upload", "cors", "progress"],
   "dependencies": {
     "component/emitter": "*",
