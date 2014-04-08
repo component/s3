@@ -17,12 +17,12 @@ module.exports = Upload;
  * @api private
  */
 
-function validateConfig() {
-  if (!S3.signature) throw new Error('S3.signature required');
-  if (!S3.bucket) throw new Error('S3.bucket required');
-  if (!S3.policy) throw new Error('S3.policy required');
-  if (!S3.key) throw new Error('S3.key required');
-  if (!S3.acl) throw new Error('S3.acl required');
+function validateConfig(config) {
+  if (!config.signature) throw new Error('S3.signature required');
+  if (!config.bucket) throw new Error('S3.bucket required');
+  if (!config.policy) throw new Error('S3.policy required');
+  if (!config.key) throw new Error('S3.key required');
+  if (!config.acl) throw new Error('S3.acl required');
 }
 
 /**
@@ -49,21 +49,23 @@ function validateConfig() {
  * @api private
  */
 
-function Upload(file, opts) {
-  if (!(this instanceof Upload)) return new Upload(file, opts);
+function Upload(file, opts, s3) {
+  /*override global S3 if defined, otherwise fall back */
+  var config = s3 || S3;
+  if (!(this instanceof Upload)) return new Upload(file, opts, config);
   opts = opts || {};
   if (!opts.protocol) opts.protocol = window.location.protocol;
-  validateConfig();
+  validateConfig(config);
   this.file = file;
   this.type = opts.type || file.type || 'application/octet-stream';
   this.name = opts.name || file.name;
   this.bucketUrl = opts.protocol + '//' + S3.bucket + '.s3.amazonaws.com';
   this.url = this.bucketUrl + '/' + this.name;
-  this.signature = S3.signature;
-  this.bucket = S3.bucket;
-  this.policy = S3.policy;
-  this.key = S3.key;
-  this.acl = S3.acl;
+  this.signature = config.signature;
+  this.bucket = config.bucket;
+  this.policy = config.policy;
+  this.key = config.key;
+  this.acl = config.acl;
 }
 
 /**
