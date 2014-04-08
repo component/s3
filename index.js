@@ -59,7 +59,7 @@ function Upload(file, opts, s3) {
   this.file = file;
   this.type = opts.type || file.type || 'application/octet-stream';
   this.name = opts.name || file.name;
-  this.bucketUrl = opts.protocol + '//' + S3.bucket + '.s3.amazonaws.com';
+  this.bucketUrl = opts.protocol + '//' + config.bucket + '.s3.amazonaws.com';
   this.url = this.bucketUrl + '/' + this.name;
   this.signature = config.signature;
   this.bucket = config.bucket;
