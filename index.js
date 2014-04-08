@@ -50,7 +50,7 @@ function validateConfig(config) {
  */
 
 function Upload(file, opts, s3) {
-  /*override global S3 if defined, otherwise fall back */
+  /*override global S3 if defined, otherwise fall back to it */
   var config = s3 || S3;
   if (!(this instanceof Upload)) return new Upload(file, opts, config);
   opts = opts || {};
