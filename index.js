@@ -64,6 +64,7 @@ function Upload(file, opts) {
   this.policy = S3.policy;
   this.key = S3.key;
   this.acl = S3.acl;
+  this.redirect = S3.redirect;
 }
 
 /**
@@ -110,6 +111,9 @@ Upload.prototype.end = function(fn){
   form.append('signature', this.signature);
   form.append('Content-Type', this.type);
   form.append('Content-Length', this.file.length);
+  if (typeof this.redirect !== 'undefined') {
+    form.append('success_action_redirect', this.redirect);
+  }
   form.append('file', this.file);
 
   xhr.open('POST', this.bucketUrl, true);
