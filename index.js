@@ -99,6 +99,9 @@ Upload.prototype.end = function(fn){
     if (2 == t) return fn();
     var err = new Error(xhr.responseText);
     err.status = xhr.status;
+    err.statusText = xhr.statusText;
+    // s3 returns errors as XML only.
+    if (xhr.responseXML) err.xmlDoc = xhr.responseXML;
     fn(err);
   };
 
