@@ -113,7 +113,7 @@ Upload.prototype.end = function(fn){
   form.append('policy', this.policy);
   form.append('signature', this.signature);
   form.append('Content-Type', this.type);
-  form.append('Content-Length', this.file.length);
+  form.append('Content-Length', this.file.length || this.file.size);
   if (typeof this.redirect !== 'undefined') {
     form.append('success_action_redirect', this.redirect);
   }
