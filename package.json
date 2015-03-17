@@ -1,5 +1,5 @@
 {
-  "name": "s3-component",
+  "name": "component-s3",
   "description": "S3 client upload library, upload files directly from the browser",
   "version": "0.4.0",
   "keywords": [
