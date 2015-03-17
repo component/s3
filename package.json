@@ -5,8 +5,10 @@
   "keywords": [
     "s3",
     "browser",
+    "file",
+    "upload",
     "cors",
-    "upload"
+    "progress"
   ],
   "dependencies": {
     "event-component": "*"

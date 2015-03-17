@@ -5,6 +5,7 @@
   "version": "0.4.0",
   "keywords": [
     "s3",
+    "browser",
     "file",
     "upload",
     "cors",
