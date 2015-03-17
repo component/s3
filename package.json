@@ -11,7 +11,12 @@
     "progress"
   ],
   "dependencies": {
-    "event-component": "*"
+    "component-emitter": "1.2.0",
+    "component-event": "0.1.4"
+  },
+  "browser": {
+    "emitter": "component-emitter",
+    "event": "component-event"
   },
   "devDependencies": {
     "bytes": "~0.2.1",
