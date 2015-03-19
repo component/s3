@@ -23,5 +23,9 @@
     "scripts": {
       "s3/index.js": "index.js"
     }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/component/s3.git"
   }
 }
