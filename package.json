@@ -11,7 +11,8 @@
     "progress"
   ],
   "dependencies": {
-    "superagent": "0.13.0"
+    "component-emitter": "1.2.0",
+    "superagent": "0.21.0"
   },
   "devDependencies": {
     "bytes": "~0.2.0",

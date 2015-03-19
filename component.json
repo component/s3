@@ -12,8 +12,8 @@
     "progress"
   ],
   "dependencies": {
-    "component/emitter": "*",
-    "visionmedia/superagent": "0.13.0"
+    "component/emitter": "1.2.0",
+    "visionmedia/superagent": "0.21.0"
   },
   "development": {
     "component/drop-anywhere": "*"
