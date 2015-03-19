@@ -1,4 +1,15 @@
 
+0.3.3 / 2015-03-19
+==================
+
+  * pin dependency versions
+  * sync "keywords"
+  * package: add "browser" mapping for browserify build
+  * package: add "repository" field
+  * package: rename to "component-s3"
+  * component: update "description"
+  * component: restore "repo" field
+
 0.3.2 / 2014-03-27
 ==================
 
