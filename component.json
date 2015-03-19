@@ -3,7 +3,14 @@
   "repo": "component/s3",
   "description": "S3 client upload library, upload files directly from the browser",
   "version": "0.3.2",
-  "keywords": ["s3", "file", "upload", "cors", "progress"],
+  "keywords": [
+    "browser",
+    "s3",
+    "file",
+    "upload",
+    "cors",
+    "progress"
+  ],
   "dependencies": {
     "component/emitter": "*",
     "visionmedia/superagent": "0.13.0"

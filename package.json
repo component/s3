@@ -3,10 +3,12 @@
   "description": "S3 client upload library",
   "version": "0.3.2",
   "keywords": [
-    "s3",
     "browser",
+    "s3",
+    "file",
+    "upload",
     "cors",
-    "upload"
+    "progress"
   ],
   "dependencies": {
     "superagent": "0.13.0"
