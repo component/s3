@@ -112,7 +112,6 @@ Upload.prototype.put = function(url, fn){
   // header
   req.set('X-Requested-With', null);
   req.set('Content-Type', this.type);
-  req.set('x-amz-acl', 'public-read');
 
   // custom fields
   for (var key in this.header) {
