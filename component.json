@@ -2,7 +2,7 @@
   "name": "s3",
   "repo": "component/s3",
   "description": "S3 client upload library",
-  "version": "0.3.3",
+  "version": "0.4.0",
   "keywords": [
     "browser",
     "s3",
